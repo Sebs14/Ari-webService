@@ -63,8 +63,8 @@ export class FileParserService {
         ]
       });
 
-      const options = { compact: true, ignoreComment: true, spaces: 4 };
-      const result = xmljs.json2xml(finalJsonContent, options);
+      var options = { compact: true, ignoreComment: true, spaces: 4 };
+      var result = xmljs.json2xml(finalJsonContent, options);
 
       if (!fs.existsSync('./outputs')) {
         fs.mkdirSync('./outputs');
@@ -87,7 +87,7 @@ export class FileParserService {
 
   async getJsonFromTxt(dto: ConvertorInfoDto, file: Express.Multer.File) {
     try {
-      const informationLines: [string?] = [];
+      var informationLines: [string?] = [];
 
       const rl = readline.createInterface({
         input: fs.createReadStream('./uploads/uploaded-txt.txt', 'utf8'),
@@ -100,8 +100,8 @@ export class FileParserService {
 
       await events.once(rl, 'close');
 
-      const json: [object?] = [];
-      for (const line in informationLines) {
+      var json: [object?] = [];
+      for (var line in informationLines) {
         const subStrings = informationLines[line].split(dto.separator);
 
         if (subStrings.length < 7) {
