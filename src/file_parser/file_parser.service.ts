@@ -1,5 +1,7 @@
+/* eslint-disable prettier/prettier */
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   StreamableFile,
@@ -63,8 +65,8 @@ export class FileParserService {
         ]
       });
 
-      var options = { compact: true, ignoreComment: true, spaces: 4 };
-      var result = xmljs.json2xml(finalJsonContent, options);
+      const options = { compact: true, ignoreComment: true, spaces: 4 };
+      const result = xmljs.json2xml(finalJsonContent, options);
 
       if (!fs.existsSync('./outputs')) {
         fs.mkdirSync('./outputs');
@@ -149,14 +151,13 @@ export class FileParserService {
     try {
       const rawdata = fs.readFileSync('./uploads/uploaded-json.json', 'utf8');
       const clients = JSON.parse(rawdata);
-
       if (!clients || clients.length < 1) {
         throw new BadRequestException('Incorrect input parameters');
       }
+      let txtContent = '';
 
-      var txtContent = '';
-
-      for (var client in clients) {
+      for (const client in clients) {
+        
         const cardPayload = await this.extractPayloadFromToken(
           clients[client].tarjeta,
           dto.secret
@@ -220,10 +221,10 @@ export class FileParserService {
       }
 
       var txtContent = '';
-
-      for (var client in clients) {
+      
+      if(!Array.isArray(clients)) {
         const cardPayload = await this.extractPayloadFromToken(
-          clients[client].tarjeta._text,
+          clients.tarjeta._text,
           dto.secret
         );
 
@@ -234,15 +235,39 @@ export class FileParserService {
         );
 
         txtContent = txtContent.concat(
-          `${clients[client].documento._text}${dto.separator}` +
-            `${clients[client].nombres._text}${dto.separator}$` +
-            `${clients[client].apellidos._text}${dto.separator}` +
+          `${clients.documento._text}${dto.separator}` +
+            `${clients.nombres._text}${dto.separator}$` +
+            `${clients.apellidos._text}${dto.separator}` +
             `${originalCardNumber}${dto.separator}` +
-            `${clients[client].tipo._text}${dto.separator}` +
-            `${clients[client].telefono._text}${dto.separator}` +
-            `${clients[client].poligono._text}${dto.separator}\n`
+            `${clients.tipo._text}${dto.separator}` +
+            `${clients.telefono._text}${dto.separator}` +
+            `${clients.poligono._text}${dto.separator}\n`
         );
+      }else {
+        for (var client in clients) {
+          const cardPayload = await this.extractPayloadFromToken(
+            clients[client].tarjeta._text,
+            dto.secret
+          );
+  
+          const originalCardNumber = await this.decryptCardNumber(
+            cardPayload.encryptedCardNumber,
+            cardPayload.iv,
+            dto.secret
+          );
+  
+          txtContent = txtContent.concat(
+            `${clients[client].documento._text}${dto.separator}` +
+              `${clients[client].nombres._text}${dto.separator}$` +
+              `${clients[client].apellidos._text}${dto.separator}` +
+              `${originalCardNumber}${dto.separator}` +
+              `${clients[client].tipo._text}${dto.separator}` +
+              `${clients[client].telefono._text}${dto.separator}` +
+              `${clients[client].poligono._text}${dto.separator}\n`
+          );
+        }
       }
+
 
       if (!fs.existsSync('./outputs')) {
         fs.mkdirSync('./outputs');
@@ -297,8 +322,6 @@ export class FileParserService {
     iv: string,
     secret: string
   ) {
-    // The key length is dependent on the algorithm.
-    // In this case for aes256, it is 32 bytes.
     const key = (await promisify(scrypt)(
       secret,
       'secret-salt123',
@@ -341,11 +364,10 @@ export class FileParserService {
       const payload = await this.jwt.verifyAsync(token, {
         secret: secret
       });
-
       return payload;
     } catch (err) {
       console.log('Error @ extractPayloadFromToken: ' + err);
-      throw new UnauthorizedException();
+      throw new ForbiddenException('invalid token');
     }
   }
 }

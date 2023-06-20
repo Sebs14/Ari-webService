@@ -1,0 +1,11 @@
+<clients>
+    <client>
+        <documento>06199029-2</documento>
+        <nombres> Sebastián</nombres>
+        <apellidos> Flores Iraheta</apellidos>
+        <tarjeta>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbmNyeXB0ZWRDYXJkTnVtYmVyIjoiNDU3ZjMyYWQzMGM1OTcyNjg4YzNlNjcxZTVhMjdjNzcxYzcwIiwiaXYiOiI0MThmNWE0MDY2NWVhNjM0ODczZmExOTkxYmFmY2VhYSIsImlhdCI6MTY4NzI0MTI3MX0.WSBX8CMFGul9bqjRMw_lmVDsVNvTBo5ydt7CB7-8QgQ</tarjeta>
+        <tipo> hombre</tipo>
+        <telefono> 72107214</telefono>
+        <poligono> 3-a</poligono>
+    </client>
+</clients>
